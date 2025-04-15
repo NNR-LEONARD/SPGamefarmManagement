@@ -1,4 +1,5 @@
-﻿namespace GamefarmManagemet
+﻿
+namespace GamefarmManagemet
 {
     partial class Form2
     {
@@ -115,6 +116,7 @@
             button6.Text = "Attendance";
             button6.TextAlign = ContentAlignment.MiddleLeft;
             button6.UseVisualStyleBackColor = false;
+            button6.Click += button6_Click;
             // 
             // button7
             // 
@@ -238,6 +240,11 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
+        }
+
+        private void button10_Click_1(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
