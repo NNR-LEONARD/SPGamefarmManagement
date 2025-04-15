@@ -52,10 +52,10 @@ namespace GamefarmManagemet
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button1.BackColor = SystemColors.ActiveCaptionText;
             button1.ForeColor = Color.White;
-            button1.Location = new Point(558, 306);
+            button1.Location = new Point(28, 308);
             button1.Margin = new Padding(10);
             button1.Name = "button1";
-            button1.Size = new Size(240, 43);
+            button1.Size = new Size(347, 43);
             button1.TabIndex = 0;
             button1.Text = "GameFowl Records";
             button1.TextAlign = ContentAlignment.MiddleLeft;
@@ -66,24 +66,25 @@ namespace GamefarmManagemet
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button2.BackColor = SystemColors.ActiveCaptionText;
             button2.ForeColor = Color.White;
-            button2.Location = new Point(558, 112);
+            button2.Location = new Point(28, 114);
             button2.Margin = new Padding(10);
             button2.Name = "button2";
-            button2.Size = new Size(240, 43);
+            button2.Size = new Size(347, 43);
             button2.TabIndex = 1;
             button2.Text = " Handlers Management";
             button2.TextAlign = ContentAlignment.MiddleLeft;
             button2.UseVisualStyleBackColor = false;
+            button2.Click += button2_Click;
             // 
             // button4
             // 
             button4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button4.BackColor = SystemColors.ActiveCaptionText;
             button4.ForeColor = Color.White;
-            button4.Location = new Point(558, 207);
+            button4.Location = new Point(28, 209);
             button4.Margin = new Padding(10);
             button4.Name = "button4";
-            button4.Size = new Size(240, 43);
+            button4.Size = new Size(347, 43);
             button4.TabIndex = 3;
             button4.Text = "Breeding Tracker";
             button4.TextAlign = ContentAlignment.MiddleLeft;
@@ -94,10 +95,10 @@ namespace GamefarmManagemet
             button5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button5.BackColor = SystemColors.ActiveCaptionText;
             button5.ForeColor = Color.White;
-            button5.Location = new Point(558, 256);
+            button5.Location = new Point(28, 258);
             button5.Margin = new Padding(10);
             button5.Name = "button5";
-            button5.Size = new Size(240, 43);
+            button5.Size = new Size(347, 43);
             button5.TabIndex = 4;
             button5.Text = "Medical Records";
             button5.TextAlign = ContentAlignment.MiddleLeft;
@@ -108,10 +109,10 @@ namespace GamefarmManagemet
             button6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button6.BackColor = SystemColors.ActiveCaptionText;
             button6.ForeColor = Color.White;
-            button6.Location = new Point(558, 62);
+            button6.Location = new Point(28, 64);
             button6.Margin = new Padding(10);
             button6.Name = "button6";
-            button6.Size = new Size(240, 43);
+            button6.Size = new Size(347, 43);
             button6.TabIndex = 5;
             button6.Text = "Attendance";
             button6.TextAlign = ContentAlignment.MiddleLeft;
@@ -123,10 +124,10 @@ namespace GamefarmManagemet
             button7.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button7.BackColor = SystemColors.ActiveCaptionText;
             button7.ForeColor = Color.White;
-            button7.Location = new Point(558, 354);
+            button7.Location = new Point(28, 356);
             button7.Margin = new Padding(10);
             button7.Name = "button7";
-            button7.Size = new Size(240, 43);
+            button7.Size = new Size(347, 43);
             button7.TabIndex = 6;
             button7.Text = "Training Logs";
             button7.TextAlign = ContentAlignment.MiddleLeft;
@@ -137,10 +138,10 @@ namespace GamefarmManagemet
             button8.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button8.BackColor = SystemColors.ActiveCaptionText;
             button8.ForeColor = Color.White;
-            button8.Location = new Point(558, 403);
+            button8.Location = new Point(28, 405);
             button8.Margin = new Padding(10);
             button8.Name = "button8";
-            button8.Size = new Size(240, 43);
+            button8.Size = new Size(347, 43);
             button8.TabIndex = 7;
             button8.Text = "Audit Log";
             button8.TextAlign = ContentAlignment.MiddleLeft;
@@ -151,10 +152,10 @@ namespace GamefarmManagemet
             button9.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button9.BackColor = SystemColors.ActiveCaptionText;
             button9.ForeColor = Color.White;
-            button9.Location = new Point(558, 489);
+            button9.Location = new Point(28, 491);
             button9.Margin = new Padding(10);
             button9.Name = "button9";
-            button9.Size = new Size(240, 43);
+            button9.Size = new Size(347, 43);
             button9.TabIndex = 8;
             button9.Text = "Exit";
             button9.TextAlign = ContentAlignment.MiddleLeft;
@@ -164,11 +165,13 @@ namespace GamefarmManagemet
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(-29, -220);
+            pictureBox1.Location = new Point(381, -4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(977, 790);
+            pictureBox1.Size = new Size(567, 574);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 9;
             pictureBox1.TabStop = false;
+            pictureBox1.Click += pictureBox1_Click;
             // 
             // pictureBox2
             // 
@@ -186,7 +189,7 @@ namespace GamefarmManagemet
             label1.BackColor = Color.Black;
             label1.Font = new Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.ForeColor = SystemColors.ButtonFace;
-            label1.Location = new Point(12, 9);
+            label1.Location = new Point(21, 18);
             label1.Name = "label1";
             label1.Size = new Size(354, 25);
             label1.TabIndex = 11;
@@ -206,10 +209,10 @@ namespace GamefarmManagemet
             button10.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button10.BackColor = SystemColors.ActiveCaptionText;
             button10.ForeColor = Color.White;
-            button10.Location = new Point(558, 159);
+            button10.Location = new Point(28, 161);
             button10.Margin = new Padding(10);
             button10.Name = "button10";
-            button10.Size = new Size(240, 43);
+            button10.Size = new Size(347, 43);
             button10.TabIndex = 14;
             button10.Text = "Fight Records";
             button10.TextAlign = ContentAlignment.MiddleLeft;

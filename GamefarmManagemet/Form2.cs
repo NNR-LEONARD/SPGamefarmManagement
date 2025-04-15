@@ -25,5 +25,17 @@ namespace GamefarmManagemet  // Still has a typo: should be GamefarmManagement i
             attendanceForm.Show();
             this.Hide();
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide(); // hide the current menu
+            HandlerManagement handlerForm = new HandlerManagement();
+            handlerForm.Show();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
