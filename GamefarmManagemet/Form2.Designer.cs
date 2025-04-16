@@ -57,6 +57,7 @@ namespace GamefarmManagemet
             button1.TabIndex = 0;
             button1.Text = "GameFowl Records";
             button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click_1;
             // 
             // button2
             // 
@@ -84,6 +85,7 @@ namespace GamefarmManagemet
             button4.TabIndex = 3;
             button4.Text = "Breeding Tracker";
             button4.UseVisualStyleBackColor = false;
+            button4.Click += button4_Click_1;
             // 
             // button5
             // 
@@ -97,6 +99,7 @@ namespace GamefarmManagemet
             button5.TabIndex = 4;
             button5.Text = "Medical Records";
             button5.UseVisualStyleBackColor = false;
+            button5.Click += button5_Click_1;
             // 
             // button6
             // 
@@ -124,6 +127,7 @@ namespace GamefarmManagemet
             button7.TabIndex = 6;
             button7.Text = "Training Logs";
             button7.UseVisualStyleBackColor = false;
+            button7.Click += button7_Click_1;
             // 
             // button8
             // 
@@ -137,6 +141,7 @@ namespace GamefarmManagemet
             button8.TabIndex = 7;
             button8.Text = "Audit Log";
             button8.UseVisualStyleBackColor = false;
+            button8.Click += button8_Click_1;
             // 
             // button9
             // 
@@ -184,6 +189,7 @@ namespace GamefarmManagemet
             label1.Size = new Size(354, 25);
             label1.TabIndex = 11;
             label1.Text = "Welcome To SP Gamefarm Management";
+            label1.Click += label1_Click;
             // 
             // Form2
             // 

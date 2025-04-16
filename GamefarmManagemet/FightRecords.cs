@@ -48,7 +48,7 @@ namespace GamefarmManagemet
 
             fightGrid.Columns.Add("Fight_ID", "Fight ID");
             fightGrid.Columns.Add("GameFowl_ID", "GameFowl ID");
-            fightGrid.Columns.Add("OpponentBreed", "Opponent Breed");
+            fightGrid.Columns.Add("Opponent", "Opponent");
             fightGrid.Columns.Add("Fight_Date", "Fight Date");
             fightGrid.Columns.Add("Location", "Location");
             fightGrid.Columns.Add("Result", "Result");
@@ -92,17 +92,17 @@ namespace GamefarmManagemet
             // Sample static records (can be loaded from database in real app)
             var fightRecords = new List<string[]>
             {
-                new string[] { "1", "100", "Kelso", "2025-01-05", "Arena1", "Win", "0" },
-                new string[] { "2", "101", "Sweater", "2025-01-05", "Arena1", "Loss", "1" },
-                new string[] { "3", "102", "Sweater", "2025-01-05", "Arena1", "Win", "0" },
-                new string[] { "4", "103", "Claret", "2025-01-05", "Arena1", "Win", "1" },
-                new string[] { "5", "104", "Kelso", "2025-01-05", "Arena1", "Win", "0" },
-                new string[] { "6", "105", "Sweater", "2025-01-10", "Arena2", "Loss", "1" },
-                new string[] { "7", "106", "Kelso", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "8", "107", "Sweater", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "9", "108", "Claret", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "10", "109", "Sweater", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "11", "201", "Kelso", "2024-02-01", "Arena1", "Win", "0" }
+                new string[] { "1", "100", "AA Gamefarm", "2025-01-05", "Arena1", "Win", "0" },
+                new string[] { "2", "101", "AKB Gamefarm", "2025-01-05", "Arena1", "Loss", "1" },
+                new string[] { "3", "102", "SPS Gamefarm", "2025-01-05", "Arena1", "Win", "0" },
+                new string[] { "4", "103", "NNR Gamefarm", "2025-01-05", "Arena1", "Win", "1" },
+                new string[] { "5", "104", "WHITES Gamefarm", "2025-01-05", "Arena1", "Win", "0" },
+                new string[] { "6", "105", "SPG Gamefarm", "2025-01-10", "Arena2", "Loss", "1" },
+                new string[] { "7", "106", "WP Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
+                new string[] { "8", "107", "TRIPLE Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
+                new string[] { "9", "108", "DUO Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
+                new string[] { "10", "109", "SHARKS Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
+                new string[] { "11", "201", "SSS Gamefarm", "2024-02-01", "Arena1", "Win", "0" }
             };
 
             foreach (var record in fightRecords)

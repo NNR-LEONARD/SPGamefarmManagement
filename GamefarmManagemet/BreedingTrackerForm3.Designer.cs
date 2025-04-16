@@ -1,6 +1,6 @@
 ﻿namespace GamefarmManagemet
 {
-    partial class HandlerManagement
+    partial class BreedingTrackerForm3
     {
         /// <summary>
         /// Required designer variable.
@@ -28,14 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SuspendLayout();
-            // 
-            // HandlerManagement
-            // 
-            ClientSize = new Size(1053, 565);
-            Name = "HandlerManagement";
-            Load += HandlerManagement_Load;
-            ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Text = "BreedingTrackerForm3";
         }
 
         #endregion

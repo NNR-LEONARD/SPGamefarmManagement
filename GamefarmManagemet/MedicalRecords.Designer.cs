@@ -1,6 +1,6 @@
 ﻿namespace GamefarmManagemet
 {
-    partial class HandlerManagement
+    partial class MedicalRecords
     {
         /// <summary>
         /// Required designer variable.
@@ -30,11 +30,14 @@
         {
             SuspendLayout();
             // 
-            // HandlerManagement
+            // MedicalRecords
             // 
-            ClientSize = new Size(1053, 565);
-            Name = "HandlerManagement";
-            Load += HandlerManagement_Load;
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Name = "MedicalRecords";
+            Text = "MedicalRecords";
+            Load += MedicalRecords_Load;
             ResumeLayout(false);
         }
 

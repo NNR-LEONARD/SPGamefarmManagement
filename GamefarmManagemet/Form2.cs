@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Security.AccessControl;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
-namespace GamefarmManagemet  // Still has a typo: should be GamefarmManagement if you want to fix that
+namespace GamefarmManagemet 
 {
     public partial class Form2 : Form
     {
@@ -87,6 +88,47 @@ namespace GamefarmManagemet  // Still has a typo: should be GamefarmManagement i
         }
 
         private void Form2_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            GamefowlsRecords recordsForm = new GamefowlsRecords();
+            recordsForm.Show();
+            this.Hide(); // Optional: Hide main menu
+        }
+
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            this.Hide();
+            Breeding menuForm = new Breeding(); // Replace with your actual form
+            menuForm.Show();
+        }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            this.Hide();
+            MedicalRecords menuForm = new MedicalRecords(); // Replace with your actual form
+            menuForm.Show();
+        }
+
+        private void button7_Click_1(object sender, EventArgs e)
+        {
+            this.Hide();
+            TrainingLogs menuForm = new TrainingLogs(); // Replace with your actual form
+            menuForm.Show();
+        }
+
+        private void button8_Click_1(object sender, EventArgs e)
+        {
+            this.Hide();
+            AuditLogs menuForm = new AuditLogs(); // Replace with your actual form
+            menuForm.Show();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
         {
 
         }

@@ -1,6 +1,6 @@
 ﻿namespace GamefarmManagemet
 {
-    partial class HandlerManagement
+    partial class GamefowlsRecords
     {
         /// <summary>
         /// Required designer variable.
@@ -30,11 +30,14 @@
         {
             SuspendLayout();
             // 
-            // HandlerManagement
+            // GamefowlsRecords
             // 
-            ClientSize = new Size(1053, 565);
-            Name = "HandlerManagement";
-            Load += HandlerManagement_Load;
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Name = "GamefowlsRecords";
+            Text = "GamefowlsRecords";
+            Load += GamefowlsRecords_Load;
             ResumeLayout(false);
         }
 

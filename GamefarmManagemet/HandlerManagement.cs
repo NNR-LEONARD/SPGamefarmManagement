@@ -18,12 +18,12 @@ namespace GamefarmManagemet
         {
             InitializeLayout();
             ApplyDarkMode();
-            LoadHandlers(); // Load initial handler data
+            LoadHandlers();
         }
 
         private void InitializeLayout()
         {
-            this.Size = new Size(800, 500);
+            this.Size = new Size(1000, 800);
             this.Text = "Handlers Management";
             this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -35,10 +35,47 @@ namespace GamefarmManagemet
                 Location = new Point(20, 20)
             };
 
+            // Buttons at the top, below the title
+            int buttonY = 70;
+            int spacing = 140;
+
+            btnAddHandler = new Button()
+            {
+                Text = "Add Handler",
+                Location = new Point(20, buttonY),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
+            btnEditHandler = new Button()
+            {
+                Text = "Edit Handler",
+                Location = new Point(20 + spacing, buttonY),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
+            btnDeleteHandler = new Button()
+            {
+                Text = "Delete Handler",
+                Location = new Point(20 + spacing * 2, buttonY),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
+            btnBackToMenu = new Button()
+            {
+                Text = "Back to Menu",
+                Location = new Point(20 + spacing * 3, buttonY),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
             handlersGrid = new DataGridView()
             {
-                Location = new Point(20, 70),
-                Size = new Size(740, 300),
+                Location = new Point(20, 120), // Moved down
+                Size = new Size(940, 620),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
                 AllowUserToAddRows = false,
                 ReadOnly = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -51,45 +88,17 @@ namespace GamefarmManagemet
             handlersGrid.Columns.Add("HandlerRole", "Handler Role");
             handlersGrid.Columns.Add("HandlerSalary", "Handler Salary");
 
-            btnAddHandler = new Button()
-            {
-                Text = "Add Handler",
-                Location = new Point(20, 390),
-                Size = new Size(120, 30)
-            };
-
-            btnEditHandler = new Button()
-            {
-                Text = "Edit Handler",
-                Location = new Point(160, 390),
-                Size = new Size(120, 30)
-            };
-
-            btnDeleteHandler = new Button()
-            {
-                Text = "Delete Handler",
-                Location = new Point(300, 390),
-                Size = new Size(120, 30)
-            };
-
-            btnBackToMenu = new Button()
-            {
-                Text = "Back to Menu",
-                Location = new Point(640, 390),
-                Size = new Size(120, 30)
-            };
-
             btnAddHandler.Click += BtnAddHandler_Click;
             btnEditHandler.Click += BtnEditHandler_Click;
             btnDeleteHandler.Click += BtnDeleteHandler_Click;
             btnBackToMenu.Click += BtnBackToMenu_Click;
 
             this.Controls.Add(titleLabel);
-            this.Controls.Add(handlersGrid);
             this.Controls.Add(btnAddHandler);
             this.Controls.Add(btnEditHandler);
             this.Controls.Add(btnDeleteHandler);
             this.Controls.Add(btnBackToMenu);
+            this.Controls.Add(handlersGrid);
         }
 
         private void LoadHandlers()
@@ -150,7 +159,7 @@ namespace GamefarmManagemet
         private void BtnBackToMenu_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Form2 menuForm = new Form2(); // Change to your actual menu form name
+            Form2 menuForm = new Form2(); // Replace with your actual form
             menuForm.Show();
         }
 
@@ -181,6 +190,10 @@ namespace GamefarmManagemet
             handlersGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 60);
             handlersGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             handlersGrid.EnableHeadersVisualStyles = false;
+        }
+
+        private void HandlerManagement_Load(object sender, EventArgs e)
+        {
         }
     }
 }

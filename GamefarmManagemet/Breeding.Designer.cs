@@ -1,6 +1,6 @@
 ﻿namespace GamefarmManagemet
 {
-    partial class HandlerManagement
+    partial class Breeding
     {
         /// <summary>
         /// Required designer variable.
@@ -30,11 +30,14 @@
         {
             SuspendLayout();
             // 
-            // HandlerManagement
+            // Breeding
             // 
-            ClientSize = new Size(1053, 565);
-            Name = "HandlerManagement";
-            Load += HandlerManagement_Load;
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Name = "Breeding";
+            Text = "Breeding";
+            Load += Breeding_Load;
             ResumeLayout(false);
         }
 
