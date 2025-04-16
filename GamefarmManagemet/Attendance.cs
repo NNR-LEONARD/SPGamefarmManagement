@@ -12,14 +12,14 @@ namespace GamefarmManagemet
         private DateTimePicker datePicker;
         private Button btnMarkPresent;
         private Button btnMarkAbsent;
-        private Button btnBack; // Back button to go back to Form2
+        private Button btnBack;
 
         public Attendance()
         {
             InitializeComponent();
             InitializeLayout();
             ApplyDarkMode();
-            LoadHandlers(); // load 5 handlers when form loads
+            LoadHandlers();
         }
 
         private void Attendance_Load(object sender, EventArgs e)
@@ -28,34 +28,38 @@ namespace GamefarmManagemet
 
         private void InitializeLayout()
         {
-            this.Size = new Size(800, 500);
+            this.Size = new Size(1000, 800);
             this.Text = "Attendance";
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.Resize += Attendance_Resize;
 
             titleLabel = new Label()
             {
                 Text = "Attendance Sheet",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(20, 20),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
             datePicker = new DateTimePicker()
             {
-                Location = new Point(600, 30),
+                Location = new Point(this.ClientSize.Width - 180, 30),
                 Width = 160,
-                Format = DateTimePickerFormat.Short
+                Format = DateTimePickerFormat.Short,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
 
             attendanceGrid = new DataGridView()
             {
                 Location = new Point(20, 70),
-                Size = new Size(740, 300),
+                Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 500),
                 AllowUserToAddRows = false,
-                ReadOnly = false, // allow editing status
+                ReadOnly = false,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = false
+                MultiSelect = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
             };
 
             attendanceGrid.Columns.Add("HandlerID", "Handler ID");
@@ -66,34 +70,47 @@ namespace GamefarmManagemet
             btnMarkPresent = new Button()
             {
                 Text = "Mark Present",
-                Location = new Point(20, 390),
-                Size = new Size(120, 30)
+                Location = new Point(20, this.ClientSize.Height - 80),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
 
             btnMarkAbsent = new Button()
             {
                 Text = "Mark Absent",
-                Location = new Point(160, 390),
-                Size = new Size(120, 30)
+                Location = new Point(160, this.ClientSize.Height - 80),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
 
             btnBack = new Button()
             {
                 Text = "Back to Menu",
-                Location = new Point(600, 390),
-                Size = new Size(120, 30)
+                Location = new Point(this.ClientSize.Width - 140, this.ClientSize.Height - 80),
+                Size = new Size(120, 30),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Right
             };
 
             btnMarkPresent.Click += BtnMarkPresent_Click;
             btnMarkAbsent.Click += BtnMarkAbsent_Click;
-            btnBack.Click += BtnBack_Click; // Back button event handler
+            btnBack.Click += BtnBack_Click;
 
             this.Controls.Add(titleLabel);
             this.Controls.Add(datePicker);
             this.Controls.Add(attendanceGrid);
             this.Controls.Add(btnMarkPresent);
             this.Controls.Add(btnMarkAbsent);
-            this.Controls.Add(btnBack); // Adding back button to the form
+            this.Controls.Add(btnBack);
+        }
+
+        private void Attendance_Resize(object sender, EventArgs e)
+        {
+            // Resize the grid and reposition buttons
+            attendanceGrid.Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 500);
+            datePicker.Location = new Point(this.ClientSize.Width - 180, 30);
+            btnMarkPresent.Location = new Point(20, this.ClientSize.Height - 80);
+            btnMarkAbsent.Location = new Point(160, this.ClientSize.Height - 80);
+            btnBack.Location = new Point(this.ClientSize.Width - 140, this.ClientSize.Height - 80);
         }
 
         private void BtnMarkPresent_Click(object sender, EventArgs e)
@@ -133,13 +150,12 @@ namespace GamefarmManagemet
 
             foreach (var handler in handlers)
             {
-                attendanceGrid.Rows.Add(handler.id, handler.name, "", ""); // empty date/status to start
+                attendanceGrid.Rows.Add(handler.id, handler.name, "", "");
             }
         }
 
         private void BtnBack_Click(object sender, EventArgs e)
         {
-            // Close the current form (Attendance) and show Form2 (menu page)
             this.Close();
             Form2 form2 = new Form2();
             form2.Show();

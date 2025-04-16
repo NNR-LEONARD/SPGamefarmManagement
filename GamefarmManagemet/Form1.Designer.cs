@@ -40,7 +40,7 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.Font = new Font("Perpetua", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button1.ForeColor = SystemColors.ActiveCaptionText;
-            button1.Location = new Point(651, 517);
+            button1.Location = new Point(424, 622);
             button1.Name = "button1";
             button1.Size = new Size(172, 56);
             button1.TabIndex = 0;
@@ -51,9 +51,10 @@
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(-20, -203);
+            pictureBox1.Location = new Point(2, -69);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1031, 847);
+            pictureBox1.Size = new Size(981, 823);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
             // 
@@ -61,7 +62,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1000, 639);
+            ClientSize = new Size(982, 753);
             Controls.Add(button1);
             Controls.Add(pictureBox1);
             Name = "Form1";
