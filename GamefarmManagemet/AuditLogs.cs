@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace GamefarmManagemet
 {
@@ -10,6 +11,9 @@ namespace GamefarmManagemet
         private Label titleLabel;
         private DataGridView auditGrid;
         private Button btnBack;
+
+        // 🔑 Replace with your actual DB credentials
+        private string connectionString = "server=localhost;user id=root;password=Leonard010504.;database=ex_db";
 
         public AuditLogs()
         {
@@ -53,10 +57,12 @@ namespace GamefarmManagemet
                 MultiSelect = false
             };
 
-            auditGrid.Columns.Add("Log_ID", "Log_ID");
-            auditGrid.Columns.Add("User", "User");
-            auditGrid.Columns.Add("Action", "Action");
-            auditGrid.Columns.Add("Timestamp", "Timestamp");
+            auditGrid.Columns.Add("Log_ID", "Log ID");
+            auditGrid.Columns.Add("Handler_ID", "Handler ID");
+            auditGrid.Columns.Add("Action_Type", "Action Type");
+            auditGrid.Columns.Add("Old_Value", "Old Salary");
+            auditGrid.Columns.Add("New_Value", "New Salary");
+            auditGrid.Columns.Add("Log_Time", "Timestamp");
 
             this.Controls.Add(titleLabel);
             this.Controls.Add(btnBack);
@@ -65,18 +71,35 @@ namespace GamefarmManagemet
 
         private void LoadAuditLogs()
         {
-            // Sample data — replace with your actual audit logs
-            var logs = new List<(int logID, string user, string action, string timestamp)>
+            try
             {
-                (1, "Training", "Update", "2025-04-15 08:00:00"),
-                (2, "Training", "Update", "2025-04-15 08:05:00"),
-                (3, "Training", "Update", "2025-04-15 08:30:00"),
-                (4, "Training", "Update", "2025-04-15 09:00:00")
-            };
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"SELECT log_id, handler_id, action_type, old_value, new_value, log_time FROM audit_log ORDER BY log_time DESC";
 
-            foreach (var log in logs)
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        auditGrid.Rows.Clear();
+
+                        while (reader.Read())
+                        {
+                            auditGrid.Rows.Add(
+                                reader["log_id"].ToString(),
+                                reader["handler_id"].ToString(),
+                                reader["action_type"].ToString(),
+                                reader["old_value"].ToString(),
+                                reader["new_value"].ToString(),
+                                Convert.ToDateTime(reader["log_time"]).ToString("yyyy-MM-dd HH:mm:ss")
+                            );
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                auditGrid.Rows.Add(log.logID, log.user, log.action, log.timestamp);
+                MessageBox.Show("Error loading audit logs:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -111,14 +134,15 @@ namespace GamefarmManagemet
 
         private void BtnBack_Click(object sender, EventArgs e)
         {
-            this.Hide(); // Or this.Close();
+            this.Hide(); // or this.Close();
             Form2 mainMenu = new Form2();
             mainMenu.Show();
         }
 
         private void AuditLogs_Load(object sender, EventArgs e)
         {
-
+            // Optional: auto refresh on load
+            LoadAuditLogs();
         }
     }
 }

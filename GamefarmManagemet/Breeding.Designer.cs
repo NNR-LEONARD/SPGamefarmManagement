@@ -32,13 +32,13 @@
             // 
             // Breeding
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Name = "Breeding";
-            Text = "Breeding";
-            Load += Breeding_Load;
-            ResumeLayout(false);
+            //AutoScaleDimensions = new SizeF(8F, 20F);
+            //AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(982, 753);
+            //Name = "Breeding";
+            //Text = "Breeding";
+            //Load += Breeding_Load;
+            //ResumeLayout(false);
         }
 
         #endregion

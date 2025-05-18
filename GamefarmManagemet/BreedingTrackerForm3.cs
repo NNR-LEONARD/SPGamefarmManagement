@@ -16,5 +16,10 @@ namespace GamefarmManagemet
         {
             InitializeComponent();
         }
+
+        private void BreedingTrackerForm3_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace GamefarmManagemet
 {
@@ -14,6 +15,8 @@ namespace GamefarmManagemet
         private Button btnDelete;
         private Button btnBack;
 
+        private string connectionString = "server=localhost;uid=root;pwd=Leonard010504.;database=ex_db;";
+
         public GamefowlsRecords()
         {
             InitializeComponent();
@@ -21,11 +24,6 @@ namespace GamefarmManagemet
             ApplyDarkMode();
             LoadGamefowlsData();
         }
-        private void GamefowlsRecords_Load(object sender, EventArgs e)
-        {
-            // You can leave it empty or call something like LoadGamefowlsData();
-        }
-
 
         private void InitializeLayout()
         {
@@ -50,13 +48,15 @@ namespace GamefarmManagemet
                 Location = new Point(20, buttonY),
                 Size = new Size(120, 30)
             };
+            btnAdd.Click += BtnAdd_Click;
 
             btnEdit = new Button()
             {
-                Text = "Edit",
+                Text = "Edit Status",
                 Location = new Point(20 + spacing, buttonY),
                 Size = new Size(120, 30)
             };
+            btnEdit.Click += BtnEdit_Click;
 
             btnDelete = new Button()
             {
@@ -64,6 +64,7 @@ namespace GamefarmManagemet
                 Location = new Point(20 + spacing * 2, buttonY),
                 Size = new Size(120, 30)
             };
+            btnDelete.Click += BtnDelete_Click;
 
             btnBack = new Button()
             {
@@ -72,7 +73,6 @@ namespace GamefarmManagemet
                 Size = new Size(120, 30)
             };
             btnBack.Click += BtnBack_Click;
-
 
             gamefowlGrid = new DataGridView()
             {
@@ -100,27 +100,161 @@ namespace GamefarmManagemet
 
         private void LoadGamefowlsData()
         {
-            var gamefowls = new List<(int id, string bloodline, string hatched, string status)>
-            {
-                (1, "Asil", "2024-01-01", "Breeding"),
-                (2, "SuperSweater", "2024-01-01", "Breeding"),
-                (100, "SBR", "2024-01-22", "BabyStag"),
-                (101, "Claret x Gull", "2024-01-22", "BroodCock"),
-                (102, "Sweater", "2024-01-22", "BroodCock"),
-                (103, "White Kelso", "2024-01-22", "BroodCock"),
-                (104, "Claret", "2024-01-22", "BroodCock"),
-                (105, "SBR", "2024-01-22", "BroodCock"),
-                (106, "Melsims", "2024-01-22", "BroodCock"),
-                (107, "Sweater", "2024-01-22", "Culling"),
-                (108, "Gilmore", "2024-01-22", "BroodCock"),
-                (109, "Gilmore", "2024-01-22", "BroodCock"),
-                (200, "TestBloodline", "2024-01-01", "Available"),
-                (201, "ClaretGull", "2024-01-01", "Cock")
-            };
+            string query = "SELECT GameFowl_ID, Bloodline, Date_Hatched, Status FROM gamefowls";
 
-            foreach (var g in gamefowls)
+            try
             {
-                gamefowlGrid.Rows.Add(g.id, g.bloodline, g.hatched, g.status);
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            gamefowlGrid.Rows.Clear();
+
+                            while (reader.Read())
+                            {
+                                int id = reader.GetInt32("GameFowl_ID");
+                                string bloodline = reader.GetString("Bloodline");
+                                DateTime dateHatched = reader.GetDateTime("Date_Hatched");
+                                string status = reader.GetString("Status");
+
+                                gamefowlGrid.Rows.Add(id, bloodline, dateHatched.ToString("yyyy-MM-dd"), status);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading data: " + ex.Message);
+            }
+        }
+
+        private void BtnAdd_Click(object sender, EventArgs e)
+        {
+            string bloodline = Microsoft.VisualBasic.Interaction.InputBox("Enter Bloodline:", "Add Gamefowl", "");
+            string dateHatched = Microsoft.VisualBasic.Interaction.InputBox("Enter Date Hatched (yyyy-MM-dd):", "Add Gamefowl", DateTime.Today.ToString("yyyy-MM-dd"));
+
+            if (!string.IsNullOrEmpty(bloodline) && !string.IsNullOrEmpty(dateHatched))
+            {
+                using (StatusDialog statusDialog = new StatusDialog())
+                {
+                    if (statusDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string status = statusDialog.SelectedStatus;
+
+                        try
+                        {
+                            using (MySqlConnection conn = new MySqlConnection(connectionString))
+                            {
+                                conn.Open();
+                                string insertQuery = "INSERT INTO gamefowls (Bloodline, Date_Hatched, Status) VALUES (@bloodline, @dateHatched, @status)";
+                                using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+                                {
+                                    cmd.Parameters.AddWithValue("@bloodline", bloodline);
+                                    cmd.Parameters.AddWithValue("@dateHatched", DateTime.Parse(dateHatched));
+                                    cmd.Parameters.AddWithValue("@status", status);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+
+                            MessageBox.Show("Gamefowl added successfully.");
+                            LoadGamefowlsData();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error adding data: " + ex.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Bloodline and Date Hatched are required.");
+            }
+        }
+
+        private void BtnEdit_Click(object sender, EventArgs e)
+        {
+            if (gamefowlGrid.SelectedRows.Count > 0)
+            {
+                int selectedID = Convert.ToInt32(gamefowlGrid.SelectedRows[0].Cells["GameFowl_ID"].Value);
+                string currentStatus = gamefowlGrid.SelectedRows[0].Cells["Status"].Value.ToString();
+
+                using (StatusDialog statusDialog = new StatusDialog(currentStatus))
+                {
+                    if (statusDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string newStatus = statusDialog.SelectedStatus;
+
+                        try
+                        {
+                            using (MySqlConnection conn = new MySqlConnection(connectionString))
+                            {
+                                conn.Open();
+                                string updateQuery = "UPDATE gamefowls SET Status = @status WHERE GameFowl_ID = @id";
+                                using (MySqlCommand cmd = new MySqlCommand(updateQuery, conn))
+                                {
+                                    cmd.Parameters.AddWithValue("@status", newStatus);
+                                    cmd.Parameters.AddWithValue("@id", selectedID);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+
+                            MessageBox.Show("Status updated.");
+                            LoadGamefowlsData();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error updating status: " + ex.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a gamefowl to edit.");
+            }
+        }
+
+        private void BtnDelete_Click(object sender, EventArgs e)
+        {
+            if (gamefowlGrid.SelectedRows.Count > 0)
+            {
+                int selectedID = Convert.ToInt32(gamefowlGrid.SelectedRows[0].Cells["GameFowl_ID"].Value);
+
+                var confirmResult = MessageBox.Show("Are you sure you want to delete this gamefowl?",
+                    "Confirm Delete", MessageBoxButtons.YesNo);
+
+                if (confirmResult == DialogResult.Yes)
+                {
+                    try
+                    {
+                        using (MySqlConnection conn = new MySqlConnection(connectionString))
+                        {
+                            conn.Open();
+                            string deleteQuery = "DELETE FROM gamefowls WHERE GameFowl_ID = @id";
+                            using (MySqlCommand cmd = new MySqlCommand(deleteQuery, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@id", selectedID);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        MessageBox.Show("Gamefowl deleted.");
+                        LoadGamefowlsData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error deleting gamefowl: " + ex.Message);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a gamefowl to delete.");
             }
         }
 
@@ -152,12 +286,85 @@ namespace GamefarmManagemet
             gamefowlGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             gamefowlGrid.EnableHeadersVisualStyles = false;
         }
+
         private void BtnBack_Click(object sender, EventArgs e)
         {
-            this.Hide(); // or this.Close(); if you don't plan to return
-            Form2 mainMenu = new Form2(); // make sure Form1 exists and is imported
+            this.Hide();
+            Form2 mainMenu = new Form2();
             mainMenu.Show();
         }
 
+        // Inner class for Status selection dialog
+        private class StatusDialog : Form
+        {
+            private ComboBox comboBox;
+            private Button btnOK;
+            private Button btnCancel;
+
+            public string SelectedStatus { get; private set; }
+
+            public StatusDialog(string currentStatus = "")
+            {
+                this.StartPosition = FormStartPosition.CenterParent;
+                this.Text = "Select Status";
+                this.ClientSize = new Size(240, 90);
+                this.FormBorderStyle = FormBorderStyle.FixedDialog;
+                this.MaximizeBox = false;
+                this.MinimizeBox = false;
+                this.ShowInTaskbar = false;
+
+                comboBox = new ComboBox()
+                {
+                    Location = new Point(15, 15),
+                    Width = 200,
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                };
+
+                comboBox.Items.Add("Breeding");
+                comboBox.Items.Add("Ready to Fight");
+
+                if (!string.IsNullOrEmpty(currentStatus) && comboBox.Items.Contains(currentStatus))
+                {
+                    comboBox.SelectedItem = currentStatus;
+                }
+                else
+                {
+                    comboBox.SelectedIndex = 0;
+                }
+
+                btnOK = new Button()
+                {
+                    Text = "OK",
+                    DialogResult = DialogResult.OK,
+                    Location = new Point(15, 50),
+                    Width = 90,
+                };
+
+                btnCancel = new Button()
+                {
+                    Text = "Cancel",
+                    DialogResult = DialogResult.Cancel,
+                    Location = new Point(125, 50),
+                    Width = 90,
+                };
+
+                this.Controls.Add(comboBox);
+                this.Controls.Add(btnOK);
+                this.Controls.Add(btnCancel);
+
+                this.AcceptButton = btnOK;
+                this.CancelButton = btnCancel;
+
+                btnOK.Click += (s, e) =>
+                {
+                    SelectedStatus = comboBox.SelectedItem.ToString();
+                };
+            }
+        }
+
+        private void GamefowlsRecords_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

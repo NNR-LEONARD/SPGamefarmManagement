@@ -37,7 +37,7 @@
             ClientSize = new Size(800, 450);
             Name = "TrainingLogs";
             Text = "TrainingLogs";
-            Load += TrainingLogs_Load;
+            //Load += TrainingLogs_Load;
             ResumeLayout(false);
         }
 

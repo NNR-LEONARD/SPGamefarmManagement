@@ -37,7 +37,7 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Name = "FightRecords";
             this.Text = "FightRecords";
-            this.Load += new System.EventHandler(this.FightRecords_Load);  // Event hookup
+           // this.Load += new System.EventHandler(this.FightRecords_Load);  // Event hookup
             this.ResumeLayout(false);
         }
 

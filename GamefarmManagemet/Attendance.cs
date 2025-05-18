@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace GamefarmManagemet
 {
@@ -14,16 +15,15 @@ namespace GamefarmManagemet
         private Button btnMarkAbsent;
         private Button btnBack;
 
+        // Replace with your actual connection string
+        private string connectionString = "server=localhost;database=ex_db;uid=root;pwd=Leonard010504.;";
+
         public Attendance()
         {
             InitializeComponent();
             InitializeLayout();
             ApplyDarkMode();
-            LoadHandlers();
-        }
-
-        private void Attendance_Load(object sender, EventArgs e)
-        {
+            LoadAttendance();
         }
 
         private void InitializeLayout()
@@ -55,7 +55,7 @@ namespace GamefarmManagemet
                 Location = new Point(20, 70),
                 Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 500),
                 AllowUserToAddRows = false,
-                ReadOnly = false,
+                ReadOnly = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
@@ -105,7 +105,6 @@ namespace GamefarmManagemet
 
         private void Attendance_Resize(object sender, EventArgs e)
         {
-            // Resize the grid and reposition buttons
             attendanceGrid.Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 500);
             datePicker.Location = new Point(this.ClientSize.Width - 180, 30);
             btnMarkPresent.Location = new Point(20, this.ClientSize.Height - 80);
@@ -128,7 +127,53 @@ namespace GamefarmManagemet
             if (attendanceGrid.SelectedRows.Count > 0)
             {
                 DataGridViewRow selectedRow = attendanceGrid.SelectedRows[0];
-                selectedRow.Cells["Date"].Value = datePicker.Value.ToShortDateString();
+                string handlerID = selectedRow.Cells["HandlerID"].Value.ToString();
+                string handlerName = selectedRow.Cells["HandlerName"].Value.ToString();
+                string date = datePicker.Value.ToString("yyyy-MM-dd");
+
+                // Insert or update attendance in DB
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Check if record exists for that handler and date
+                    string checkQuery = "SELECT COUNT(*) FROM attendance WHERE HandlerID=@HandlerID AND Date=@Date";
+                    using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@HandlerID", handlerID);
+                        checkCmd.Parameters.AddWithValue("@Date", date);
+                        int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                        if (count > 0)
+                        {
+                            // Update existing record
+                            string updateQuery = "UPDATE attendance SET Status=@Status WHERE HandlerID=@HandlerID AND Date=@Date";
+                            using (MySqlCommand updateCmd = new MySqlCommand(updateQuery, conn))
+                            {
+                                updateCmd.Parameters.AddWithValue("@Status", status);
+                                updateCmd.Parameters.AddWithValue("@HandlerID", handlerID);
+                                updateCmd.Parameters.AddWithValue("@Date", date);
+                                updateCmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            // Insert new record
+                            string insertQuery = "INSERT INTO attendance (HandlerID, Handler_name, Date, Status) VALUES (@HandlerID, @Handler_name, @Date, @Status)";
+                            using (MySqlCommand insertCmd = new MySqlCommand(insertQuery, conn))
+                            {
+                                insertCmd.Parameters.AddWithValue("@HandlerID", handlerID);
+                                insertCmd.Parameters.AddWithValue("@Handler_name", handlerName);
+                                insertCmd.Parameters.AddWithValue("@Date", date);
+                                insertCmd.Parameters.AddWithValue("@Status", status);
+                                insertCmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+
+                // Update grid display
+                selectedRow.Cells["Date"].Value = date;
                 selectedRow.Cells["Status"].Value = status;
             }
             else
@@ -137,20 +182,53 @@ namespace GamefarmManagemet
             }
         }
 
-        private void LoadHandlers()
+        private void LoadAttendance()
         {
-            var handlers = new List<(string id, string name)>
-            {
-                ("H001", "Juan Dela Cruz"),
-                ("H002", "Maria Santos"),
-                ("H003", "Pedro Reyes"),
-                ("H004", "Ana Lopez"),
-                ("H005", "Jose Garcia")
-            };
+            attendanceGrid.Rows.Clear();
 
-            foreach (var handler in handlers)
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
-                attendanceGrid.Rows.Add(handler.id, handler.name, "", "");
+                conn.Open();
+
+                // Get list of all handlers first to display all
+                string handlersQuery = "SELECT DISTINCT Handler_ID, Handler_Name FROM handlermanagement ORDER BY Handler_name";
+                var handlers = new List<(string id, string name)>();
+
+                using (MySqlCommand cmd = new MySqlCommand(handlersQuery, conn))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Convert Handler_ID (int) to string
+                        string id = reader.GetInt32(reader.GetOrdinal("Handler_ID")).ToString();
+                        string name = reader.GetString("Handler_Name");
+                        handlers.Add((id, name));
+                    }
+                }
+
+
+                // For each handler, get attendance record for selected date
+                string selectedDate = datePicker.Value.ToString("yyyy-MM-dd");
+
+                foreach (var handler in handlers)
+                {
+                    string attendanceQuery = "SELECT Status FROM attendance WHERE HandlerID=@HandlerID AND Date=@Date LIMIT 1";
+                    string status = "";
+
+                    using (MySqlCommand attendanceCmd = new MySqlCommand(attendanceQuery, conn))
+                    {
+                        attendanceCmd.Parameters.AddWithValue("@HandlerID", handler.id);
+                        attendanceCmd.Parameters.AddWithValue("@Date", selectedDate);
+
+                        object result = attendanceCmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            status = result.ToString();
+                        }
+                    }
+
+                    attendanceGrid.Rows.Add(handler.id, handler.name, selectedDate, status);
+                }
             }
         }
 

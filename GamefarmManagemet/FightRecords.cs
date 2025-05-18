@@ -1,135 +1,175 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace GamefarmManagemet
 {
     public partial class FightRecords : Form
     {
-        private Label titleLabel;
         private DataGridView fightGrid;
-        private Button btnBack;
+        private TextBox txtGameFowlID, txtOpponentBreed, txtLocation;
+        private ComboBox cmbResult;
+        private DateTimePicker dtpFightDate;
+        private CheckBox chkInjured;
+        private Button btnAdd, btnBack;
+
+        string connectionString = "server=localhost;database=ex_db;uid=root;pwd=Leonard010504.;";
 
         public FightRecords()
         {
             InitializeComponent();
             InitializeLayout();
             ApplyDarkMode();
-            // The Load event is connected in the designer, so no need to call it manually here
+            LoadFightRecords();
         }
 
         private void InitializeLayout()
         {
-            this.Size = new Size(1000, 800);
+            this.Size = new Size(1000, 700);
             this.Text = "Fight Records";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Resize += FightRecords_Resize;
 
-            titleLabel = new Label()
+            Label lblTitle = new Label()
             {
                 Text = "Fight Records",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
-                AutoSize = true,
                 Location = new Point(20, 20),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
+                AutoSize = true
             };
+            this.Controls.Add(lblTitle);
 
             fightGrid = new DataGridView()
             {
                 Location = new Point(20, 70),
-                Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 150),
-                AllowUserToAddRows = false,
+                Size = new Size(940, 300),
                 ReadOnly = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
+                AllowUserToAddRows = false,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
+            this.Controls.Add(fightGrid);
 
-            fightGrid.Columns.Add("Fight_ID", "Fight ID");
-            fightGrid.Columns.Add("GameFowl_ID", "GameFowl ID");
-            fightGrid.Columns.Add("Opponent", "Opponent");
-            fightGrid.Columns.Add("Fight_Date", "Fight Date");
-            fightGrid.Columns.Add("Location", "Location");
-            fightGrid.Columns.Add("Result", "Result");
-            fightGrid.Columns.Add("Injured", "Injured");
+            // Input Fields
+            Label lblGameFowlID = new Label() { Text = "GameFowl ID:", Location = new Point(20, 390), AutoSize = true };
+            txtGameFowlID = new TextBox() { Location = new Point(130, 385), Width = 100 };
+
+            Label lblOpponent = new Label() { Text = "Opponent:", Location = new Point(250, 390), AutoSize = true };
+            txtOpponentBreed = new TextBox() { Location = new Point(330, 385), Width = 120 };
+
+            Label lblDate = new Label() { Text = "Date:", Location = new Point(470, 390), AutoSize = true };
+            dtpFightDate = new DateTimePicker() { Location = new Point(520, 385), Format = DateTimePickerFormat.Short };
+
+            Label lblLocation = new Label() { Text = "Location:", Location = new Point(660, 390), AutoSize = true };
+            txtLocation = new TextBox() { Location = new Point(730, 385), Width = 100 };
+
+            Label lblResult = new Label() { Text = "Result:", Location = new Point(20, 430), AutoSize = true };
+            cmbResult = new ComboBox() { Location = new Point(80, 425), Width = 100 };
+            cmbResult.Items.AddRange(new[] { "Win", "Loss" });
+            cmbResult.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            chkInjured = new CheckBox() { Text = "Injured", Location = new Point(200, 427) };
+
+            btnAdd = new Button()
+            {
+                Text = "Add Fight",
+                Location = new Point(320, 425),
+                Width = 100
+            };
+            btnAdd.Click += BtnAdd_Click;
 
             btnBack = new Button()
             {
                 Text = "Back to Menu",
-                Size = new Size(120, 30),
-                Location = new Point(this.ClientSize.Width - 140, this.ClientSize.Height - 60),
-                Anchor = AnchorStyles.Bottom | AnchorStyles.Right
+                Location = new Point(830, 600),
+                Width = 120
             };
-            btnBack.Click += BtnBack_Click;
+            btnBack.Click += (s, e) => { this.Close(); new Form2().Show(); };
 
-            this.Controls.Add(titleLabel);
-            this.Controls.Add(fightGrid);
-            this.Controls.Add(btnBack);
-        }
-
-        private void FightRecords_Resize(object sender, EventArgs e)
-        {
-            fightGrid.Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 150);
-            btnBack.Location = new Point(this.ClientSize.Width - 140, this.ClientSize.Height - 60);
-        }
-
-        private void BtnBack_Click(object sender, EventArgs e)
-        {
-            this.Close();
-            Form2 form2 = new Form2();
-            form2.Show();
-        }
-
-        // This is the missing FightRecords_Load method
-        private void FightRecords_Load(object sender, EventArgs e)
-        {
-            LoadFightRecords();
+            this.Controls.AddRange(new Control[] {
+                lblGameFowlID, txtGameFowlID,
+                lblOpponent, txtOpponentBreed,
+                lblDate, dtpFightDate,
+                lblLocation, txtLocation,
+                lblResult, cmbResult,
+                chkInjured, btnAdd, btnBack
+            });
         }
 
         private void LoadFightRecords()
         {
-            // Sample static records (can be loaded from database in real app)
-            var fightRecords = new List<string[]>
-            {
-                new string[] { "1", "100", "AA Gamefarm", "2025-01-05", "Arena1", "Win", "0" },
-                new string[] { "2", "101", "AKB Gamefarm", "2025-01-05", "Arena1", "Loss", "1" },
-                new string[] { "3", "102", "SPS Gamefarm", "2025-01-05", "Arena1", "Win", "0" },
-                new string[] { "4", "103", "NNR Gamefarm", "2025-01-05", "Arena1", "Win", "1" },
-                new string[] { "5", "104", "WHITES Gamefarm", "2025-01-05", "Arena1", "Win", "0" },
-                new string[] { "6", "105", "SPG Gamefarm", "2025-01-10", "Arena2", "Loss", "1" },
-                new string[] { "7", "106", "WP Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "8", "107", "TRIPLE Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "9", "108", "DUO Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "10", "109", "SHARKS Gamefarm", "2025-01-10", "Arena2", "Win", "0" },
-                new string[] { "11", "201", "SSS Gamefarm", "2024-02-01", "Arena1", "Win", "0" }
-            };
+            fightGrid.Columns.Clear();
+            fightGrid.Rows.Clear();
 
-            foreach (var record in fightRecords)
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
-                fightGrid.Rows.Add(record);
+                conn.Open();
+                string query = "SELECT * FROM fightrecord";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                fightGrid.Columns.Add("Fight_ID", "Fight ID");
+                fightGrid.Columns.Add("GameFowl_ID", "GameFowl ID");
+                fightGrid.Columns.Add("OpponentBreed", "Opponent");
+                fightGrid.Columns.Add("Fight_Date", "Date");
+                fightGrid.Columns.Add("Location", "Location");
+                fightGrid.Columns.Add("Result", "Result");
+                fightGrid.Columns.Add("Injured", "Injured");
+
+                while (reader.Read())
+                {
+                    fightGrid.Rows.Add(
+                        reader["Fight_ID"].ToString(),
+                        reader["GameFowl_ID"].ToString(),
+                        reader["OpponentBreed"].ToString(),
+                        Convert.ToDateTime(reader["Fight_Date"]).ToString("yyyy-MM-dd"),
+                        reader["Location"].ToString(),
+                        reader["Result"].ToString(),
+                        reader["Injured"].ToString()
+                    );
+                }
+
+                conn.Close();
+            }
+        }
+
+        private void BtnAdd_Click(object sender, EventArgs e)
+        {
+            if (txtGameFowlID.Text == "" || txtOpponentBreed.Text == "" || txtLocation.Text == "" || cmbResult.SelectedItem == null)
+            {
+                MessageBox.Show("Please fill all fields", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string insertQuery = @"INSERT INTO fightrecord
+                    (GameFowl_ID, OpponentBreed, Fight_Date, Location, Result, Injured)
+                    VALUES (@GameFowl_ID, @OpponentBreed, @Fight_Date, @Location, @Result, @Injured)";
+                MySqlCommand cmd = new MySqlCommand(insertQuery, conn);
+                cmd.Parameters.AddWithValue("@GameFowl_ID", txtGameFowlID.Text);
+                cmd.Parameters.AddWithValue("@OpponentBreed", txtOpponentBreed.Text);
+                cmd.Parameters.AddWithValue("@Fight_Date", dtpFightDate.Value.Date);
+                cmd.Parameters.AddWithValue("@Location", txtLocation.Text);
+                cmd.Parameters.AddWithValue("@Result", cmbResult.SelectedItem.ToString());
+                cmd.Parameters.AddWithValue("@Injured", chkInjured.Checked ? 1 : 0);
+
+                cmd.ExecuteNonQuery();
+                conn.Close();
+
+                MessageBox.Show("Fight record added!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadFightRecords();
             }
         }
 
         private void ApplyDarkMode()
         {
             this.BackColor = Color.FromArgb(30, 30, 30);
-            this.ForeColor = Color.Gainsboro;
-
             foreach (Control ctrl in this.Controls)
             {
-                if (ctrl is Label || ctrl is Button)
-                {
-                    ctrl.ForeColor = Color.Gainsboro;
-                    ctrl.BackColor = Color.FromArgb(45, 45, 45);
-                }
-
-                if (ctrl is Button btn)
-                {
-                    btn.FlatStyle = FlatStyle.Flat;
-                    btn.FlatAppearance.BorderColor = Color.DimGray;
-                    btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 60, 60);
-                }
+                ctrl.ForeColor = Color.White;
+                ctrl.BackColor = ctrl is Button ? Color.FromArgb(45, 45, 45) : Color.FromArgb(30, 30, 30);
             }
 
             fightGrid.BackgroundColor = Color.FromArgb(40, 40, 40);

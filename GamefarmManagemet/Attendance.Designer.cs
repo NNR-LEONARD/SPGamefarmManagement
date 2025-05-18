@@ -32,13 +32,13 @@
             // 
             // Attendance
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //AutoScaleDimensions = new SizeF(8F, 20F);
+            //AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 753);
-            Name = "Attendance";
-            Text = "Attendance";
-            Load += Attendance_Load;
-            ResumeLayout(false);
+            //Name = "Attendance";
+            //Text = "Attendance";
+            //Load += Attendance_Load;
+            //ResumeLayout(false);
         }
 
         #endregion
