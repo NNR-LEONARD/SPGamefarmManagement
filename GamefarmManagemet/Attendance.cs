@@ -267,5 +267,10 @@ namespace GamefarmManagemet
             attendanceGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             attendanceGrid.EnableHeadersVisualStyles = false;
         }
+
+        private void Attendance_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

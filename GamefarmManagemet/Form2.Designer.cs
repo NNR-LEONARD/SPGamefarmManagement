@@ -92,12 +92,12 @@ namespace GamefarmManagemet
             button5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button5.BackColor = SystemColors.ActiveCaptionText;
             button5.ForeColor = Color.White;
-            button5.Location = new Point(63, 420);
+            button5.Location = new Point(63, 662);
             button5.Margin = new Padding(10);
             button5.Name = "button5";
             button5.Size = new Size(278, 60);
             button5.TabIndex = 4;
-            button5.Text = "Medical Records";
+            button5.Text = "Log Out";
             button5.UseVisualStyleBackColor = false;
             button5.Click += button5_Click_1;
             // 
@@ -119,13 +119,13 @@ namespace GamefarmManagemet
             // 
             button7.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button7.BackColor = SystemColors.ActiveCaptionText;
-            button7.ForeColor = Color.White;
+            button7.ForeColor = Color.Black;
             button7.Location = new Point(63, 490);
             button7.Margin = new Padding(10);
             button7.Name = "button7";
             button7.Size = new Size(278, 60);
             button7.TabIndex = 6;
-            button7.Text = "Training Logs";
+            button7.Text = " ";
             button7.UseVisualStyleBackColor = false;
             button7.Click += button7_Click_1;
             // 
@@ -134,7 +134,7 @@ namespace GamefarmManagemet
             button8.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             button8.BackColor = SystemColors.ActiveCaptionText;
             button8.ForeColor = Color.White;
-            button8.Location = new Point(63, 559);
+            button8.Location = new Point(63, 426);
             button8.Margin = new Padding(10);
             button8.Name = "button8";
             button8.Size = new Size(278, 60);
@@ -177,6 +177,7 @@ namespace GamefarmManagemet
             pictureBox2.Size = new Size(993, 755);
             pictureBox2.TabIndex = 10;
             pictureBox2.TabStop = false;
+            //pictureBox2.Click += pictureBox2_Click;
             // 
             // label1
             // 
@@ -199,7 +200,6 @@ namespace GamefarmManagemet
             Controls.Add(label1);
             Controls.Add(button9);
             Controls.Add(button8);
-            Controls.Add(button7);
             Controls.Add(button6);
             Controls.Add(button5);
             Controls.Add(button4);
@@ -207,9 +207,9 @@ namespace GamefarmManagemet
             Controls.Add(button1);
             Controls.Add(pictureBox1);
             Controls.Add(pictureBox2);
+            Controls.Add(button7);
             Name = "Form2";
             Text = "Form2";
-            Load += Form2_Load_1;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);

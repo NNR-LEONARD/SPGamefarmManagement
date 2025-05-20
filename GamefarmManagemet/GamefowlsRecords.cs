@@ -11,7 +11,6 @@ namespace GamefarmManagemet
         private Label titleLabel;
         private DataGridView gamefowlGrid;
         private Button btnAdd;
-        private Button btnEdit;
         private Button btnDelete;
         private Button btnBack;
 
@@ -50,18 +49,10 @@ namespace GamefarmManagemet
             };
             btnAdd.Click += BtnAdd_Click;
 
-            btnEdit = new Button()
-            {
-                Text = "Edit Status",
-                Location = new Point(20 + spacing, buttonY),
-                Size = new Size(120, 30)
-            };
-            btnEdit.Click += BtnEdit_Click;
-
             btnDelete = new Button()
             {
                 Text = "Delete",
-                Location = new Point(20 + spacing * 2, buttonY),
+                Location = new Point(20 + spacing, buttonY),
                 Size = new Size(120, 30)
             };
             btnDelete.Click += BtnDelete_Click;
@@ -69,7 +60,7 @@ namespace GamefarmManagemet
             btnBack = new Button()
             {
                 Text = "Back to Menu",
-                Location = new Point(20 + spacing * 3, buttonY),
+                Location = new Point(20 + spacing * 2, buttonY),
                 Size = new Size(120, 30)
             };
             btnBack.Click += BtnBack_Click;
@@ -88,11 +79,10 @@ namespace GamefarmManagemet
             gamefowlGrid.Columns.Add("GameFowl_ID", "GameFowl ID");
             gamefowlGrid.Columns.Add("Bloodline", "Bloodline");
             gamefowlGrid.Columns.Add("Date_Hatched", "Date Hatched");
-            gamefowlGrid.Columns.Add("Status", "Status");
+            gamefowlGrid.Columns.Add("Band_Number", "Band Number");
 
             this.Controls.Add(titleLabel);
             this.Controls.Add(btnAdd);
-            this.Controls.Add(btnEdit);
             this.Controls.Add(btnDelete);
             this.Controls.Add(btnBack);
             this.Controls.Add(gamefowlGrid);
@@ -100,7 +90,7 @@ namespace GamefarmManagemet
 
         private void LoadGamefowlsData()
         {
-            string query = "SELECT GameFowl_ID, Bloodline, Date_Hatched, Status FROM gamefowls";
+            string query = "SELECT GameFowl_ID, Bloodline, Date_Hatched, Band_Number FROM gamefowls";
 
             try
             {
@@ -118,9 +108,9 @@ namespace GamefarmManagemet
                                 int id = reader.GetInt32("GameFowl_ID");
                                 string bloodline = reader.GetString("Bloodline");
                                 DateTime dateHatched = reader.GetDateTime("Date_Hatched");
-                                string status = reader.GetString("Status");
+                                string bandNumber = reader.GetString("Band_Number");
 
-                                gamefowlGrid.Rows.Add(id, bloodline, dateHatched.ToString("yyyy-MM-dd"), status);
+                                gamefowlGrid.Rows.Add(id, bloodline, dateHatched.ToString("yyyy-MM-dd"), bandNumber);
                             }
                         }
                     }
@@ -139,23 +129,23 @@ namespace GamefarmManagemet
 
             if (!string.IsNullOrEmpty(bloodline) && !string.IsNullOrEmpty(dateHatched))
             {
-                using (StatusDialog statusDialog = new StatusDialog())
+                using (BandNumberDialog bandNumberDialog = new BandNumberDialog())
                 {
-                    if (statusDialog.ShowDialog() == DialogResult.OK)
+                    if (bandNumberDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string status = statusDialog.SelectedStatus;
+                        string bandNumber = bandNumberDialog.SelectedBandNumber;
 
                         try
                         {
                             using (MySqlConnection conn = new MySqlConnection(connectionString))
                             {
                                 conn.Open();
-                                string insertQuery = "INSERT INTO gamefowls (Bloodline, Date_Hatched, Status) VALUES (@bloodline, @dateHatched, @status)";
+                                string insertQuery = "INSERT INTO gamefowls (Bloodline, Date_Hatched, Band_Number) VALUES (@bloodline, @dateHatched, @bandNumber)";
                                 using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
                                 {
                                     cmd.Parameters.AddWithValue("@bloodline", bloodline);
                                     cmd.Parameters.AddWithValue("@dateHatched", DateTime.Parse(dateHatched));
-                                    cmd.Parameters.AddWithValue("@status", status);
+                                    cmd.Parameters.AddWithValue("@bandNumber", bandNumber);
                                     cmd.ExecuteNonQuery();
                                 }
                             }
@@ -173,49 +163,6 @@ namespace GamefarmManagemet
             else
             {
                 MessageBox.Show("Bloodline and Date Hatched are required.");
-            }
-        }
-
-        private void BtnEdit_Click(object sender, EventArgs e)
-        {
-            if (gamefowlGrid.SelectedRows.Count > 0)
-            {
-                int selectedID = Convert.ToInt32(gamefowlGrid.SelectedRows[0].Cells["GameFowl_ID"].Value);
-                string currentStatus = gamefowlGrid.SelectedRows[0].Cells["Status"].Value.ToString();
-
-                using (StatusDialog statusDialog = new StatusDialog(currentStatus))
-                {
-                    if (statusDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string newStatus = statusDialog.SelectedStatus;
-
-                        try
-                        {
-                            using (MySqlConnection conn = new MySqlConnection(connectionString))
-                            {
-                                conn.Open();
-                                string updateQuery = "UPDATE gamefowls SET Status = @status WHERE GameFowl_ID = @id";
-                                using (MySqlCommand cmd = new MySqlCommand(updateQuery, conn))
-                                {
-                                    cmd.Parameters.AddWithValue("@status", newStatus);
-                                    cmd.Parameters.AddWithValue("@id", selectedID);
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
-
-                            MessageBox.Show("Status updated.");
-                            LoadGamefowlsData();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("Error updating status: " + ex.Message);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a gamefowl to edit.");
             }
         }
 
@@ -294,43 +241,30 @@ namespace GamefarmManagemet
             mainMenu.Show();
         }
 
-        // Inner class for Status selection dialog
-        private class StatusDialog : Form
+        // Inner class for Band Number input dialog
+        private class BandNumberDialog : Form
         {
-            private ComboBox comboBox;
+            private TextBox textBox;
             private Button btnOK;
             private Button btnCancel;
 
-            public string SelectedStatus { get; private set; }
+            public string SelectedBandNumber { get; private set; }
 
-            public StatusDialog(string currentStatus = "")
+            public BandNumberDialog()
             {
                 this.StartPosition = FormStartPosition.CenterParent;
-                this.Text = "Select Status";
+                this.Text = "Enter Band Number";
                 this.ClientSize = new Size(240, 90);
                 this.FormBorderStyle = FormBorderStyle.FixedDialog;
                 this.MaximizeBox = false;
                 this.MinimizeBox = false;
                 this.ShowInTaskbar = false;
 
-                comboBox = new ComboBox()
+                textBox = new TextBox()
                 {
                     Location = new Point(15, 15),
-                    Width = 200,
-                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Width = 200
                 };
-
-                comboBox.Items.Add("Breeding");
-                comboBox.Items.Add("Ready to Fight");
-
-                if (!string.IsNullOrEmpty(currentStatus) && comboBox.Items.Contains(currentStatus))
-                {
-                    comboBox.SelectedItem = currentStatus;
-                }
-                else
-                {
-                    comboBox.SelectedIndex = 0;
-                }
 
                 btnOK = new Button()
                 {
@@ -348,7 +282,7 @@ namespace GamefarmManagemet
                     Width = 90,
                 };
 
-                this.Controls.Add(comboBox);
+                this.Controls.Add(textBox);
                 this.Controls.Add(btnOK);
                 this.Controls.Add(btnCancel);
 
@@ -357,7 +291,15 @@ namespace GamefarmManagemet
 
                 btnOK.Click += (s, e) =>
                 {
-                    SelectedStatus = comboBox.SelectedItem.ToString();
+                    if (!string.IsNullOrWhiteSpace(textBox.Text))
+                    {
+                        SelectedBandNumber = textBox.Text.Trim();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please enter a valid band number.");
+                        DialogResult = DialogResult.None; // Prevent dialog from closing
+                    }
                 };
             }
         }

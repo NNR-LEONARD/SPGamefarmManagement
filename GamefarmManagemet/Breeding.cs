@@ -6,19 +6,25 @@ using MySql.Data.MySqlClient;
 
 namespace GamefarmManagemet
 {
-    public partial class Breeding : Form
+    public partial class BreedingRecords : Form
     {
         private Label titleLabel;
         private DataGridView breedingGrid;
-        private Button btnBack;
         private Button btnAdd;
         private Button btnDelete;
+        private Button btnBack;
 
         private string connectionString = "server=localhost;uid=root;pwd=Leonard010504.;database=ex_db;";
 
-        public Breeding()
+        public BreedingRecords()
         {
-            InitializeComponent();
+            // Manually initialize components to avoid CS8618
+            titleLabel = new Label();
+            breedingGrid = new DataGridView();
+            btnAdd = new Button();
+            btnDelete = new Button();
+            btnBack = new Button();
+
             InitializeLayout();
             ApplyDarkMode();
             LoadBreedingData();
@@ -26,7 +32,7 @@ namespace GamefarmManagemet
 
         private void InitializeLayout()
         {
-            this.Size = new Size(800, 600);
+            this.Size = new Size(1000, 800);
             this.Text = "Breeding Records";
             this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -38,35 +44,37 @@ namespace GamefarmManagemet
                 Location = new Point(20, 20)
             };
 
-            btnBack = new Button()
-            {
-                Text = "Back to Menu",
-                Location = new Point(650, 25),
-                Size = new Size(120, 30)
-            };
-            btnBack.Click += BtnBack_Click;
+            int buttonY = 70;
+            int spacing = 140;
 
             btnAdd = new Button()
             {
-                Text = "Add Breeding",
-                Location = new Point(20, 530),
+                Text = "Add",
+                Location = new Point(20, buttonY),
                 Size = new Size(120, 30)
             };
             btnAdd.Click += BtnAdd_Click;
 
             btnDelete = new Button()
             {
-                Text = "Delete Selected",
-                Location = new Point(160, 530),
+                Text = "Delete",
+                Location = new Point(20 + spacing, buttonY),
                 Size = new Size(120, 30)
             };
             btnDelete.Click += BtnDelete_Click;
 
+            btnBack = new Button()
+            {
+                Text = "Back to Menu",
+                Location = new Point(20 + spacing * 2, buttonY),
+                Size = new Size(120, 30)
+            };
+            btnBack.Click += BtnBack_Click;
+
             breedingGrid = new DataGridView()
             {
-                Location = new Point(20, 70),
-                Size = new Size(750, 450),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
+                Location = new Point(20, 120),
+                Size = new Size(940, 620),
                 AllowUserToAddRows = false,
                 ReadOnly = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -75,170 +83,179 @@ namespace GamefarmManagemet
             };
 
             breedingGrid.Columns.Add("Breeding_ID", "Breeding ID");
-            breedingGrid.Columns.Add("Father_ID", "Father ID");
-            breedingGrid.Columns.Add("Mother_ID", "Mother ID");
-            breedingGrid.Columns.Add("Label", "Label");
+            breedingGrid.Columns.Add("Gamefowl_ID", "Gamefowl ID");
+            breedingGrid.Columns.Add("Band_Number", "Band Number");
+            breedingGrid.Columns.Add("Date_Breeding", "Date of Breeding");
+            breedingGrid.Columns.Add("Event", "Event");
 
             this.Controls.Add(titleLabel);
-            this.Controls.Add(btnBack);
             this.Controls.Add(btnAdd);
             this.Controls.Add(btnDelete);
+            this.Controls.Add(btnBack);
             this.Controls.Add(breedingGrid);
         }
 
         private void LoadBreedingData()
         {
-            string query = "SELECT Breeding_ID, Father_ID, Mother_ID, Label FROM breeding ORDER BY Breeding_ID DESC";
+            string query = "SELECT Breeding_ID, Gamefowl_ID, Band_Number, Date_Breeding, Event FROM breeding_records";
 
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        breedingGrid.Rows.Clear();
-
-                        while (reader.Read())
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            int breedingID = reader.GetInt32("Breeding_ID");
-                            int fatherID = reader.GetInt32("Father_ID");
-                            int motherID = reader.GetInt32("Mother_ID");
-                            string label = reader.GetString("Label");
+                            breedingGrid.Rows.Clear();
 
-                            breedingGrid.Rows.Add(breedingID, fatherID, motherID, label);
+                            while (reader.Read())
+                            {
+                                int breedingId = reader.GetInt32("Breeding_ID");
+                                int gamefowlId = reader.GetInt32("Gamefowl_ID");
+                                string bandNumber = reader.GetString("Band_Number");
+                                DateTime dateBreeding = reader.GetDateTime("Date_Breeding");
+                                string eventType = reader.GetString("Event");
+
+                                breedingGrid.Rows.Add(breedingId, gamefowlId, bandNumber, dateBreeding.ToString("yyyy-MM-dd"), eventType);
+                            }
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading breeding data: " + ex.Message);
+                MessageBox.Show("Error loading data: " + ex.Message);
             }
         }
 
         private void BtnAdd_Click(object sender, EventArgs e)
         {
-            // Show a simple input form/dialog to get new breeding info
-            using (Form addForm = new Form())
+            string gamefowlId = Microsoft.VisualBasic.Interaction.InputBox("Enter Gamefowl ID:", "Add Breeding Record", "");
+            if (string.IsNullOrEmpty(gamefowlId) || !int.TryParse(gamefowlId, out int parsedGamefowlId))
             {
-                addForm.Text = "Add New Breeding";
-                addForm.Size = new Size(300, 250);
-                addForm.StartPosition = FormStartPosition.CenterParent;
-
-                Label lblFather = new Label() { Text = "Father ID:", Location = new Point(10, 20) };
-                TextBox txtFather = new TextBox() { Location = new Point(100, 20), Width = 150 };
-
-                Label lblMother = new Label() { Text = "Mother ID:", Location = new Point(10, 60) };
-                TextBox txtMother = new TextBox() { Location = new Point(100, 60), Width = 150 };
-
-                Label lblLabel = new Label() { Text = "Label:", Location = new Point(10, 100) };
-                ComboBox cmbLabel = new ComboBox()
-                {
-                    Location = new Point(100, 100),
-                    Width = 150,
-                    DropDownStyle = ComboBoxStyle.DropDownList
-                };
-                cmbLabel.Items.AddRange(new string[] { "Local", "Early-Bird", "Late-Born", "International" });
-                cmbLabel.SelectedIndex = 0;
-
-                Button btnSubmit = new Button() { Text = "Add", Location = new Point(100, 150), Width = 80 };
-                btnSubmit.Click += (s, ea) =>
-                {
-                    if (int.TryParse(txtFather.Text.Trim(), out int fatherId) &&
-                        int.TryParse(txtMother.Text.Trim(), out int motherId) &&
-                        cmbLabel.SelectedItem != null)
-                    {
-                        AddBreedingRecord(fatherId, motherId, cmbLabel.SelectedItem.ToString());
-                        addForm.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Please enter valid data.");
-                    }
-                };
-
-                addForm.Controls.Add(lblFather);
-                addForm.Controls.Add(txtFather);
-                addForm.Controls.Add(lblMother);
-                addForm.Controls.Add(txtMother);
-                addForm.Controls.Add(lblLabel);
-                addForm.Controls.Add(cmbLabel);
-                addForm.Controls.Add(btnSubmit);
-
-                addForm.ShowDialog();
+                MessageBox.Show("Please enter a valid Gamefowl ID.");
+                return;
             }
-        }
 
-        private void AddBreedingRecord(int fatherID, int motherID, string label)
-        {
-            string query = "INSERT INTO breeding (Father_ID, Mother_ID, Label) VALUES (@father, @mother, @label)";
-
+            // Validate Gamefowl_ID exists in gamefowls table and get associated Band_Number
+            string expectedBandNumber = null;
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    string checkQuery = "SELECT Band_Number FROM gamefowls WHERE GameFowl_ID = @id";
+                    using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@father", fatherID);
-                        cmd.Parameters.AddWithValue("@mother", motherID);
-                        cmd.Parameters.AddWithValue("@label", label);
-
-                        cmd.ExecuteNonQuery();
+                        checkCmd.Parameters.AddWithValue("@id", parsedGamefowlId);
+                        var result = checkCmd.ExecuteScalar();
+                        if (result == null)
+                        {
+                            MessageBox.Show("Gamefowl ID does not exist.");
+                            return;
+                        }
+                        expectedBandNumber = result.ToString();
                     }
                 }
-
-                LoadBreedingData(); // Refresh grid
-                MessageBox.Show("New breeding record added.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error adding breeding record: " + ex.Message);
+                MessageBox.Show("Error validating Gamefowl ID: " + ex.Message);
+                return;
+            }
+
+            string bandNumber = Microsoft.VisualBasic.Interaction.InputBox("Enter Band Number:", "Add Breeding Record", expectedBandNumber);
+            if (string.IsNullOrEmpty(bandNumber))
+            {
+                MessageBox.Show("Band Number is required.");
+                return;
+            }
+
+            // Validate Band_Number matches the one in gamefowls table
+            if (bandNumber != expectedBandNumber)
+            {
+                MessageBox.Show($"Band Number must match the Gamefowl ID's Band Number: {expectedBandNumber}");
+                return;
+            }
+
+            string dateBreeding = Microsoft.VisualBasic.Interaction.InputBox("Enter Date of Breeding (yyyy-MM-dd):", "Add Breeding Record", DateTime.Today.ToString("yyyy-MM-dd"));
+            if (string.IsNullOrEmpty(dateBreeding))
+            {
+                MessageBox.Show("Date of Breeding is required.");
+                return;
+            }
+
+            using (EventDialog eventDialog = new EventDialog())
+            {
+                if (eventDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string eventType = eventDialog.SelectedEvent;
+
+                    try
+                    {
+                        using (MySqlConnection conn = new MySqlConnection(connectionString))
+                        {
+                            conn.Open();
+                            string insertQuery = "INSERT INTO breeding_records (Gamefowl_ID, Band_Number, Date_Breeding, Event) VALUES (@gamefowlId, @bandNumber, @dateBreeding, @event)";
+                            using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@gamefowlId", parsedGamefowlId);
+                                cmd.Parameters.AddWithValue("@bandNumber", bandNumber);
+                                cmd.Parameters.AddWithValue("@dateBreeding", DateTime.Parse(dateBreeding));
+                                cmd.Parameters.AddWithValue("@event", eventType);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        MessageBox.Show("Breeding record added successfully.");
+                        LoadBreedingData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error adding data: " + ex.Message);
+                    }
+                }
             }
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            if (breedingGrid.SelectedRows.Count == 0)
+            if (breedingGrid.SelectedRows.Count > 0)
             {
-                MessageBox.Show("Please select a record to delete.");
-                return;
-            }
+                int selectedID = Convert.ToInt32(breedingGrid.SelectedRows[0].Cells["Breeding_ID"].Value);
 
-            int breedingID = Convert.ToInt32(breedingGrid.SelectedRows[0].Cells["Breeding_ID"].Value);
+                var confirmResult = MessageBox.Show("Are you sure you want to delete this breeding record?",
+                    "Confirm Delete", MessageBoxButtons.YesNo);
 
-            var confirm = MessageBox.Show("Are you sure you want to delete the selected breeding record?", "Confirm Delete", MessageBoxButtons.YesNo);
-            if (confirm == DialogResult.Yes)
-            {
-                DeleteBreedingRecord(breedingID);
-            }
-        }
-
-        private void DeleteBreedingRecord(int breedingID)
-        {
-            string query = "DELETE FROM breeding WHERE Breeding_ID = @id";
-
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                if (confirmResult == DialogResult.Yes)
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    try
                     {
-                        cmd.Parameters.AddWithValue("@id", breedingID);
-                        cmd.ExecuteNonQuery();
+                        using (MySqlConnection conn = new MySqlConnection(connectionString))
+                        {
+                            conn.Open();
+                            string deleteQuery = "DELETE FROM breeding_records WHERE Breeding_ID = @id";
+                            using (MySqlCommand cmd = new MySqlCommand(deleteQuery, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@id", selectedID);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        MessageBox.Show("Breeding record deleted.");
+                        LoadBreedingData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error deleting breeding record: " + ex.Message);
                     }
                 }
-
-                LoadBreedingData(); // Refresh grid
-                MessageBox.Show("Breeding record deleted.");
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Error deleting breeding record: " + ex.Message);
+                MessageBox.Show("Please select a breeding record to delete.");
             }
         }
 
@@ -276,6 +293,72 @@ namespace GamefarmManagemet
             this.Hide();
             Form2 mainMenu = new Form2();
             mainMenu.Show();
+        }
+
+        // Inner class for Event selection dialog
+        private class EventDialog : Form
+        {
+            private ComboBox comboBox;
+            private Button btnOK;
+            private Button btnCancel;
+
+            public string SelectedEvent { get; private set; }
+
+            public EventDialog()
+            {
+                this.StartPosition = FormStartPosition.CenterParent;
+                this.Text = "Select Event";
+                this.ClientSize = new Size(240, 90);
+                this.FormBorderStyle = FormBorderStyle.FixedDialog;
+                this.MaximizeBox = false;
+                this.MinimizeBox = false;
+                this.ShowInTaskbar = false;
+
+                comboBox = new ComboBox()
+                {
+                    Location = new Point(15, 15),
+                    Width = 200,
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                };
+
+                comboBox.Items.Add("Local-born");
+                comboBox.Items.Add("Early-bird");
+                comboBox.Items.Add("International");
+                comboBox.SelectedIndex = 0;
+
+                btnOK = new Button()
+                {
+                    Text = "OK",
+                    DialogResult = DialogResult.OK,
+                    Location = new Point(15, 50),
+                    Width = 90,
+                };
+
+                btnCancel = new Button()
+                {
+                    Text = "Cancel",
+                    DialogResult = DialogResult.Cancel,
+                    Location = new Point(125, 50),
+                    Width = 90,
+                };
+
+                this.Controls.Add(comboBox);
+                this.Controls.Add(btnOK);
+                this.Controls.Add(btnCancel);
+
+                this.AcceptButton = btnOK;
+                this.CancelButton = btnCancel;
+
+                btnOK.Click += (s, e) =>
+                {
+                    SelectedEvent = comboBox.SelectedItem.ToString();
+                };
+            }
+        }
+
+        private void BreedingRecords_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

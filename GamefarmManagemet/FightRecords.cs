@@ -179,5 +179,10 @@ namespace GamefarmManagemet
             fightGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             fightGrid.EnableHeadersVisualStyles = false;
         }
+
+        private void FightRecords_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

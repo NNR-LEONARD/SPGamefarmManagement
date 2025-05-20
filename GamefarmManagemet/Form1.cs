@@ -1,5 +1,7 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -13,22 +15,24 @@ namespace GamefarmManagemet
         private Label labelPassword;
         private TextBox textBoxPassword;
         private Button buttonLogin;
-        private LinkLabel linkForgotPassword;  // Added forgot password link
+        private LinkLabel linkForgotPassword;
 
         public Form1()
         {
             InitializeComponent();
-
             this.BackColor = Color.Black;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
 
-            // Create panel to act like a card
+            // Login Card Panel
             loginCard = new Panel();
-            loginCard.Size = new Size(300, 320); // increased height to fit link label
-            loginCard.BackColor = Color.FromArgb(30, 30, 30); // dark gray card color
-            loginCard.BorderStyle = BorderStyle.FixedSingle;
+            loginCard.Size = new Size(300, 320);
+            loginCard.BackColor = Color.FromArgb(30, 30, 30);
+            loginCard.BorderStyle = BorderStyle.None;
+            loginCard.Paint += LoginCard_Paint;
             this.Controls.Add(loginCard);
 
-            // Email label
+            // Email Label
             labelEmail = new Label();
             labelEmail.Text = "Email:";
             labelEmail.ForeColor = Color.Red;
@@ -37,14 +41,15 @@ namespace GamefarmManagemet
             labelEmail.Location = new Point(20, 30);
             loginCard.Controls.Add(labelEmail);
 
-            // Email textbox
+            // Email TextBox
             textBoxEmail = new TextBox();
             textBoxEmail.Width = 260;
             textBoxEmail.Font = new Font("Segoe UI", 11);
             textBoxEmail.Location = new Point(20, 60);
+            textBoxEmail.Margin = new Padding(20);
             loginCard.Controls.Add(textBoxEmail);
 
-            // Password label
+            // Password Label
             labelPassword = new Label();
             labelPassword.Text = "Password:";
             labelPassword.ForeColor = Color.Red;
@@ -53,15 +58,16 @@ namespace GamefarmManagemet
             labelPassword.Location = new Point(20, 110);
             loginCard.Controls.Add(labelPassword);
 
-            // Password textbox
+            // Password TextBox
             textBoxPassword = new TextBox();
             textBoxPassword.Width = 260;
             textBoxPassword.Font = new Font("Segoe UI", 11);
             textBoxPassword.Location = new Point(20, 140);
             textBoxPassword.PasswordChar = '*';
+            textBoxPassword.Margin = new Padding(20);
             loginCard.Controls.Add(textBoxPassword);
 
-            // Forgot Password LinkLabel
+            // Forgot Password Link
             linkForgotPassword = new LinkLabel();
             linkForgotPassword.Text = "Forgot Password?";
             linkForgotPassword.LinkColor = Color.Red;
@@ -74,7 +80,7 @@ namespace GamefarmManagemet
             linkForgotPassword.Click += LinkForgotPassword_Click;
             loginCard.Controls.Add(linkForgotPassword);
 
-            // Login button
+            // Login Button
             buttonLogin = new Button();
             buttonLogin.Text = "Log In";
             buttonLogin.BackColor = Color.Red;
@@ -84,10 +90,11 @@ namespace GamefarmManagemet
             buttonLogin.FlatAppearance.BorderSize = 0;
             buttonLogin.Size = new Size(260, 50);
             buttonLogin.Location = new Point(20, 210);
+            buttonLogin.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, buttonLogin.Width, buttonLogin.Height, 15, 15));
             buttonLogin.Click += buttonLogin_Click;
             loginCard.Controls.Add(buttonLogin);
 
-            // Center the loginCard panel on the form
+            // Center Card
             CenterLoginCard();
             this.Resize += (s, e) => CenterLoginCard();
         }
@@ -97,12 +104,27 @@ namespace GamefarmManagemet
             loginCard.Left = (this.ClientSize.Width - loginCard.Width) / 2;
             loginCard.Top = (this.ClientSize.Height - loginCard.Height) / 2;
         }
+
+        private void LoginCard_Paint(object sender, PaintEventArgs e)
+        {
+            int radius = 20;
+            using (GraphicsPath path = new GraphicsPath())
+            {
+                Rectangle rect = loginCard.ClientRectangle;
+                path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
+                path.AddArc(rect.Right - radius, rect.Y, radius, radius, 270, 90);
+                path.AddArc(rect.Right - radius, rect.Bottom - radius, radius, radius, 0, 90);
+                path.AddArc(rect.X, rect.Bottom - radius, radius, radius, 90, 90);
+                path.CloseAllFigures();
+                loginCard.Region = new Region(path);
+            }
+        }
+
         private void LinkForgotPassword_Click(object sender, EventArgs e)
         {
             ForgotPasswordForm forgotForm = new ForgotPasswordForm();
-            forgotForm.ShowDialog(); // opens as a modal window
+            forgotForm.ShowDialog();
         }
-
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
@@ -148,14 +170,15 @@ namespace GamefarmManagemet
             }
         }
 
+        // Importing CreateRoundRectRgn from GDI32.dll for rounded controls
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+        private static extern IntPtr CreateRoundRectRgn(
+            int nLeftRect, int nTopRect, int nRightRect, int nBottomRect,
+            int nWidthEllipse, int nHeightEllipse);
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
-
-        //private void LinkForgotPassword_Click(object sender, EventArgs e)
-        //{
-        //    MessageBox.Show("Password recovery is not implemented yet.", "Forgot Password", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //}
     }
 }

@@ -33,23 +33,17 @@
             // 
             // button1
             // 
-            // button1.BackColor = Color.Red;
-            // button1.FlatStyle = FlatStyle.Flat;
-            // button1.Font = new Font("Perpetua", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            // button1.ForeColor = SystemColors.ActiveCaptionText;
-            // button1.Location = new Point(424, 622);
-            // button1.Name = "button1";
-            // button1.Size = new Size(172, 56);
-            // button1.TabIndex = 0;
-            // button1.Text = "Get Started";
-            // button1.UseVisualStyleBackColor = false;
-            // button1.Click += button1_Click;
+            button1.Location = new Point(0, 0);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 0;
             // 
             // Form1
             // 
-            // AutoScaleDimensions = new SizeF(8F, 20F);
-            // AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 753);
+            Name = "Form1";
+            Load += Form1_Load;
+            ResumeLayout(false);
         }
 
         #endregion
