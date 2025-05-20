@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace GamefarmManagemet
 {
@@ -14,8 +16,8 @@ namespace GamefarmManagemet
         private Button btnMarkPresent;
         private Button btnMarkAbsent;
         private Button btnBack;
+        private Button btnExportExcel;
 
-        // Replace with your actual connection string
         private string connectionString = "server=localhost;database=ex_db;uid=root;pwd=Leonard010504.;";
 
         public Attendance()
@@ -49,6 +51,7 @@ namespace GamefarmManagemet
                 Format = DateTimePickerFormat.Short,
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
+            datePicker.ValueChanged += (s, e) => LoadAttendance();
 
             attendanceGrid = new DataGridView()
             {
@@ -83,6 +86,14 @@ namespace GamefarmManagemet
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
 
+            btnExportExcel = new Button()
+            {
+                Text = "Export to Excel",
+                Location = new Point(300, this.ClientSize.Height - 80),
+                Size = new Size(140, 30),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
+            };
+
             btnBack = new Button()
             {
                 Text = "Back to Menu",
@@ -94,12 +105,14 @@ namespace GamefarmManagemet
             btnMarkPresent.Click += BtnMarkPresent_Click;
             btnMarkAbsent.Click += BtnMarkAbsent_Click;
             btnBack.Click += BtnBack_Click;
+            btnExportExcel.Click += BtnExportExcel_Click;
 
             this.Controls.Add(titleLabel);
             this.Controls.Add(datePicker);
             this.Controls.Add(attendanceGrid);
             this.Controls.Add(btnMarkPresent);
             this.Controls.Add(btnMarkAbsent);
+            this.Controls.Add(btnExportExcel);
             this.Controls.Add(btnBack);
         }
 
@@ -109,6 +122,7 @@ namespace GamefarmManagemet
             datePicker.Location = new Point(this.ClientSize.Width - 180, 30);
             btnMarkPresent.Location = new Point(20, this.ClientSize.Height - 80);
             btnMarkAbsent.Location = new Point(160, this.ClientSize.Height - 80);
+            btnExportExcel.Location = new Point(300, this.ClientSize.Height - 80);
             btnBack.Location = new Point(this.ClientSize.Width - 140, this.ClientSize.Height - 80);
         }
 
@@ -131,12 +145,10 @@ namespace GamefarmManagemet
                 string handlerName = selectedRow.Cells["HandlerName"].Value.ToString();
                 string date = datePicker.Value.ToString("yyyy-MM-dd");
 
-                // Insert or update attendance in DB
                 using (MySqlConnection conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Check if record exists for that handler and date
                     string checkQuery = "SELECT COUNT(*) FROM attendance WHERE HandlerID=@HandlerID AND Date=@Date";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
                     {
@@ -146,7 +158,6 @@ namespace GamefarmManagemet
 
                         if (count > 0)
                         {
-                            // Update existing record
                             string updateQuery = "UPDATE attendance SET Status=@Status WHERE HandlerID=@HandlerID AND Date=@Date";
                             using (MySqlCommand updateCmd = new MySqlCommand(updateQuery, conn))
                             {
@@ -158,7 +169,6 @@ namespace GamefarmManagemet
                         }
                         else
                         {
-                            // Insert new record
                             string insertQuery = "INSERT INTO attendance (HandlerID, Handler_name, Date, Status) VALUES (@HandlerID, @Handler_name, @Date, @Status)";
                             using (MySqlCommand insertCmd = new MySqlCommand(insertQuery, conn))
                             {
@@ -172,7 +182,6 @@ namespace GamefarmManagemet
                     }
                 }
 
-                // Update grid display
                 selectedRow.Cells["Date"].Value = date;
                 selectedRow.Cells["Status"].Value = status;
             }
@@ -185,12 +194,10 @@ namespace GamefarmManagemet
         private void LoadAttendance()
         {
             attendanceGrid.Rows.Clear();
-
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
 
-                // Get list of all handlers first to display all
                 string handlersQuery = "SELECT DISTINCT Handler_ID, Handler_Name FROM handlermanagement ORDER BY Handler_name";
                 var handlers = new List<(string id, string name)>();
 
@@ -199,15 +206,12 @@ namespace GamefarmManagemet
                 {
                     while (reader.Read())
                     {
-                        // Convert Handler_ID (int) to string
-                        string id = reader.GetInt32(reader.GetOrdinal("Handler_ID")).ToString();
+                        string id = reader.GetInt32("Handler_ID").ToString();
                         string name = reader.GetString("Handler_Name");
                         handlers.Add((id, name));
                     }
                 }
 
-
-                // For each handler, get attendance record for selected date
                 string selectedDate = datePicker.Value.ToString("yyyy-MM-dd");
 
                 foreach (var handler in handlers)
@@ -228,6 +232,43 @@ namespace GamefarmManagemet
                     }
 
                     attendanceGrid.Rows.Add(handler.id, handler.name, selectedDate, status);
+                }
+            }
+        }
+
+        private void BtnExportExcel_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Filter = "Excel Workbook|*.xlsx";
+                saveDialog.Title = "Save Attendance Report";
+                saveDialog.FileName = $"Attendance_{datePicker.Value:yyyyMMdd}.xlsx";
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using (var workbook = new XLWorkbook())
+                    {
+                        var worksheet = workbook.Worksheets.Add("Attendance");
+
+                        for (int i = 0; i < attendanceGrid.Columns.Count; i++)
+                        {
+                            worksheet.Cell(1, i + 1).Value = attendanceGrid.Columns[i].HeaderText;
+                            worksheet.Cell(1, i + 1).Style.Font.Bold = true;
+                        }
+
+                        for (int i = 0; i < attendanceGrid.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < attendanceGrid.Columns.Count; j++)
+                            {
+                                worksheet.Cell(i + 2, j + 1).Value = attendanceGrid.Rows[i].Cells[j].Value?.ToString();
+                            }
+                        }
+
+                        worksheet.RangeUsed().SetAutoFilter();
+                        workbook.SaveAs(saveDialog.FileName);
+                    }
+
+                    MessageBox.Show("Export successful!", "Export to Excel", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -266,11 +307,6 @@ namespace GamefarmManagemet
             attendanceGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 60);
             attendanceGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             attendanceGrid.EnableHeadersVisualStyles = false;
-        }
-
-        private void Attendance_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
